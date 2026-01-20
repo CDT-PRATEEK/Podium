@@ -1,0 +1,28 @@
+.env
+credentials.py
+token.json
+token.pickle
+client_secret.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+env/
+venv/
+.myenv/
+myenv/
+
+# Static/Media
+media/
+staticfiles/
+
+# Logs
+*.log
+
+# System
+.DS_Store
+
+# IDE
+.vscode/
+.idea/

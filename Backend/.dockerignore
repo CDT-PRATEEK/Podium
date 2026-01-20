@@ -1,0 +1,27 @@
+
+.git
+.gitignore
+
+# Python/Django
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+venv
+.env
+myenv/
+.myenv/
+
+staticfiles/
+media/
+
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+build/
+
+.vscode
+.idea

@@ -1,0 +1,422 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: Custom Scrollbar */
+::-webkit-scrollbar {
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+/* =========================================
+   1. LOGIN / REGISTER BACKGROUND (Dot Grid)
+   ========================================= */
+.modern-grid-bg {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Light Mode */
+  background-color: #ffffff;
+  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+  background-size: 24px 24px;
+  transition: background-color 0.3s ease;
+}
+
+/* Dark Mode Background */
+.dark .modern-grid-bg {
+  background-color: #0f172a; /* Dark Slate */
+  background-image: 
+    radial-gradient(circle at center, transparent 0%, #0f172a 100%), 
+    radial-gradient(#1e293b 1px, transparent 1px);
+}
+
+/* =========================================
+   2. GLOBAL DARK MODE (PURE CSS - NO @APPLY)
+   ========================================= */
+
+/* Default Light Body */
+body {
+    background-color: #f9fafb; /* gray-50 */
+    color: #111827; /* gray-900 */
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
+
+.dark .bg-gray-50 {
+    background-color: #111827 !important; /* Gray 800 */
+    color: #f3f4f6 !important;
+    border-color: #374151 !important;
+}
+
+/* Dark Body */
+.dark body {
+    background-color: #06080e; /* gray-900 */
+    color: #f3f4f6;
+}
+
+/* Force White Cards to turn Dark Gray */
+.dark .bg-white {
+    background-color: #050506 !important; /* gray-800 */
+    color: #ffffff !important;
+    border-color: #374151 !important;     /* gray-700 */
+}
+
+/* Fix Text Colors */
+.dark .text-gray-900, 
+.dark .text-black {
+    color: #ffffff !important; 
+}
+
+.dark .text-gray-800,
+.dark .text-gray-700 {
+    color: #e5e7eb !important; /* gray-200 */
+}
+
+.dark .text-gray-600, 
+.dark .text-gray-500 {
+    color: #9ca3af !important; /* gray-400 */
+}
+
+/* Fix Inputs, Textareas, Selects */
+.dark input, 
+.dark textarea, 
+.dark select {
+    background-color: #111519 !important; /* gray-700 */
+    color: #ffffff !important;
+    border-color: #4b5563 !important;     /* gray-600 */
+}
+
+/* Fix Borders */
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-gray-300 {
+    border-color: #374151 !important;
+}
+
+/* =========================================
+   3. UNIVERSAL TAG SYSTEM (PURE CSS)
+   ========================================= */
+
+/* --- 1. MAIN TOPIC TAG (e.g. TECHNOLOGY) --- */
+.tag-topic {
+    display: inline-block;
+    padding: 4px 12px;
+    font-size: 0.75rem; /* 12px */
+    font-weight: 700;
+    border-radius: 9999px; /* Full rounded */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: background-color 0.2s, color 0.2s;
+    
+    /* Light Mode Default */
+    background-color: #111827; /* Gray 900 */
+    color: #ffffff;
+}
+
+/* Dark Mode Override */
+.dark .tag-topic {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* --- 2. HASHTAGS (e.g. #reactjs) --- */
+.tag-hashtag {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 8px;
+    border: 1px solid;
+    transition: all 0.2s;
+
+    /* Light Mode Default */
+    background-color: #eff6ff; /* Blue 50 */
+    color: #2563eb;           /* Blue 600 */
+    border-color: #dbeafe;    /* Blue 100 */
+}
+
+/* Dark Mode Override (High Contrast Blue) */
+.dark .tag-hashtag {
+    background-color: #172554; /* Blue 950 */
+    color: #93c5fd;           /* Blue 300 */
+    border-color: #1e40af;    /* Blue 800 */
+}
+
+/* Hover State */
+.tag-hashtag:hover {
+    opacity: 0.8;
+}
+
+
+/* --- MOBILE SLEEK TWEAKS --- */
+@media (max-width: 640px) {
+  .tag-topic, .tag-hashtag {
+    /* Tiny Font + Minimal Padding = No Cutting */
+    font-size: 9px !important; 
+    padding: 2px 7px !important;
+    letter-spacing: 0.03em;
+    /* Remove any fixed height that might be causing the cut */
+    height: auto !important; 
+    min-height: 16px;
+  }
+}
+
+
+
+/* ReactQuill Images */
+.ql-editor img {
+  max-width: 100%;    /* Stop images from overflowing the screen */
+  height: auto;       /* Keep the aspect ratio */
+  display: block;     /* Force image to its own line (not inline with text) */
+  margin: 1rem auto;  /* Add space above/below and center it */
+  border-radius: 8px; /* Optional: Makes it look nicer */
+}
+
+
+.ql-container {
+  font-size: 1.1rem; 
+  min-height: 200px;
+}
+
+/* 1. HIDE IMAGES IN FEED */
+/* This ensures the feed card only shows text, even if the user started with an image */
+.feed-summary img {
+    display: none !important;
+}
+
+/* 2. HIDE OTHER BLOCK ELEMENTS */
+/* This prevents videos or large dividers from breaking the 3-line preview */
+.feed-summary iframe, 
+.feed-summary video {
+    display: none !important;
+}
+
+/* 3. CLEAN TEXT WRAPPING */
+/* This ensures the text looks like a clean paragraph in the preview */
+.feed-summary * {
+    display: inline; /* Forces everything to flow like one paragraph */
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 1rem !important; /* Standardizes preview text size */
+    line-height: 1.6 !important;
+}
+
+.feed-summary {
+    position: relative;
+    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+}
+
+
+/* Professional Image Styling for Post Content */
+.prose img {
+    display: block;
+    
+    /* 1. SMART SIZING: Never stretch small images */
+    width: auto;
+    max-width: 100%; /* Keeps it inside the text column to prevent pixel tearing */
+    height: auto;
+
+    /* 2. REAL CENTERING: The most reliable way */
+    margin-left: auto;
+    margin-right: auto;
+    
+    /* 3. SPACING & STYLE */
+    margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* Optional: Slight zoom on hover for a premium feel */
+.prose img:hover {
+    transform: scale(1.01);
+}
+
+
+
+
+
+/* ================================
+   MOBILE PROFILE: NATIVE APP MODE
+   ================================ */
+
+@media (max-width: 767px) {
+
+  /* 1. Main Container: Remove side padding for edge-to-edge feel */
+  .profile-page {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-bottom: 6rem !important; /* Extra space for bottom nav */
+  }
+
+  /* 2. Header: Cleaner, Flat Look (Removes the "Box" effect) */
+  .profile-header {
+    padding: 1rem 1.25rem !important; 
+    margin-bottom: 0 !important; /* Connects directly to tabs */
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important; 
+    text-align: center !important; /* Force center alignment */
+  }
+
+  /* 3. Avatar: Perfect Mobile Size */
+  .profile-avatar {
+    width: 88px !important;  /* 5.5rem */
+    height: 88px !important;
+    margin: 0 auto 1rem auto !important; /* Center it */
+    border-width: 3px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* 4. Bio: Tighter & More Readable */
+  .profile-bio {
+    font-size: 0.95rem !important;
+    line-height: 1.5;
+    margin-bottom: 1.5rem !important;
+    padding: 0 0.5rem;
+    color: #4b5563; /* Gray-600 */
+  }
+  /* Dark mode bio color */
+  .dark .profile-bio { color: #d1d5db !important; }
+
+  /* 5. TABS: STICKY HEADER (The "Pro" Feature) 
+     This makes the tabs stick to the top under the navbar when scrolling */
+  .profile-tabs {
+    position: sticky !important;
+    top: 64px !important; /* Adjusts for your Navbar height */
+    z-index: 40 !important;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    margin: 0 !important; /* Remove margins */
+    padding: 0.5rem 1rem 0 1rem !important;
+    border-bottom: 1px solid #f3f4f6 !important; /* Gray-100 */
+    border-radius: 0 !important;
+  }
+  /* Dark mode tabs background */
+  .dark .profile-tabs {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: #1f2937 !important; /* Gray-800 */
+  }
+
+  /* 6. Posts: Distinct "Card" Look with nice separation */
+  .profile-post {
+    margin: 1rem 1rem 0 1rem !important; /* Side margins for card look */
+    padding: 1rem !important;
+    border-radius: 16px !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+  }
+}
+
+/* =========================================
+   MOBILE NOTIFICATION DROPDOWN (FIXED)
+   ========================================= */
+
+@media (max-width: 767px) {
+
+  .notif-dropdown {
+    position: fixed !important;
+    left: 50% !important;
+    right: auto !important;
+    top: 4rem; /* below top bar */
+    transform: translateX(-50%) !important;
+
+    width: calc(100vw - 1.5rem) !important;
+    max-width: 420px;
+
+    margin-top: 0 !important;
+    border-radius: 1rem;
+    z-index: 9999;
+  }
+
+  /* Scroll container height */
+  .notif-dropdown .custom-scrollbar {
+    max-height: 65vh;
+  }
+
+}
+
+
+/* =========================================
+   MOBILE EDITOR RESPONSIVENESS (FINAL)
+   ========================================= */
+
+@media (max-width: 767px) {
+
+  /* ===== Editor container ===== */
+  .editor-container {
+    padding: 1rem !important;
+    border-radius: 1rem;
+    margin-bottom: 5.5rem; /* safe space for bottom nav */
+  }
+
+  /* ===== Header ===== */
+  .editor-container h3 {
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  /* ===== Title input ===== */
+  .editor-container input[type="text"] {
+    font-size: 1rem;
+    padding: 0.65rem 0.75rem;
+  }
+
+  /* ===== Topic + tags row ===== */
+  .editor-container .editor-meta {
+    gap: 0.6rem;
+  }
+
+  .editor-container select,
+  .editor-container .editor-meta input {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  /* ===== ReactQuill wrapper ===== */
+  .editor-container .quill-wrapper {
+    height: 42vh !important;
+    max-height: 42vh !important;
+    border-radius: 0.75rem;
+  }
+
+  /* Toolbar-aware editor height */
+  .editor-container .ql-container {
+    height: calc(42vh - 42px) !important;
+  }
+
+  /* ===== Action buttons wrapper ===== */
+  .editor-container .editor-actions {
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+  }
+
+  /* ===== Buttons (compact, mobile-sized) ===== */
+  .editor-container .editor-actions button {
+    width: 100%;
+    min-height: 40px;
+    padding: 0.45rem 0.9rem !important;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 0.6rem;
+    line-height: 1.2;
+  }
+
+  /* Cancel button slightly lighter */
+  .editor-container .editor-actions button[type="button"] {
+    padding: 0.4rem 0.9rem !important;
+    font-weight: 500;
+  }
+
+}
+

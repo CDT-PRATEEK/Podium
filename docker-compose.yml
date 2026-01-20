@@ -1,0 +1,29 @@
+services:
+  # Backend Service 
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    env_file:
+      - ./backend/.env
+    environment:
+      - AI_SERVICE_URL=http://ai_service:8001/analyze_sentiment
+    depends_on:
+      - ai_service
+    
+    # This forces Uvicorn with --reload so you see code changes instantly.
+    command: uvicorn mysite.asgi:application --host 0.0.0.0 --port 8000 --reload
+
+  # AI Service 
+  ai_service:
+    build:
+      context: ./ai_service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./ai_service:/app
