@@ -8,6 +8,16 @@ app = FastAPI()
 # Load the default profanity list
 profanity.load_censor_words()
 
+
+@app.get("/")
+@app.head("/")
+def read_root():
+    return {
+        "status": "online",
+        "service": "Podium AI Microservice",
+        "author": "Prateek Sinha"
+    }
+
 # Custom Data Model
 
 class TextCheck(BaseModel):

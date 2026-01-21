@@ -76,7 +76,7 @@ export default function Login({ onLogin, showToast, setView }) {
                 type="text" 
                 value={username} 
                 onChange={e => setUsername(e.target.value)}
-                placeholder="e.g. batman"
+                placeholder="e.g. Arnav"
                 required 
               />
             </div>
