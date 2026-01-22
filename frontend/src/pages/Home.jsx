@@ -476,7 +476,7 @@ useEffect(() => {
                                 </div>
 
                                 <div 
-                                    className="prose prose-lg dark:prose-invert text-gray-700 dark:text-gray-300 max-w-none line-clamp-3 mb-4 feed-summary" 
+                                    className="prose prose-lg dark:prose-invert text-gray-700 dark:text-gray-300 max-w-none line-clamp-3 mb-4 feed-summary break-words" 
                                     dangerouslySetInnerHTML={{ __html: post.content }} 
                                 />
                                 

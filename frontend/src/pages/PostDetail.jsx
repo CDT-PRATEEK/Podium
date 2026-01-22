@@ -196,7 +196,7 @@ useEffect(() => {
                 ))}
             </div>
 
-            <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight mb-6 md:mb-8">
+            <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight mb-6 md:mb-8 break-words">
                 {post.title}
             </h1>
 
