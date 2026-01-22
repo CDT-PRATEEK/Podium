@@ -196,7 +196,7 @@ useEffect(() => {
                 ))}
             </div>
 
-            <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight mb-6 md:mb-8 break-words">
+            <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight mb-6 md:mb-8 break-words whitespace-normal">
                 {post.title}
             </h1>
 
@@ -247,7 +247,7 @@ useEffect(() => {
 
         {/* Post Content */}
         <div 
-            className="prose prose-lg md:prose-xl prose-slate dark:prose-invert max-w-none break-words overflow-hidden text-gray-800 dark:text-gray-200 leading-relaxed mb-12 md:mb-16" 
+            className="prose prose-lg md:prose-xl prose-slate dark:prose-invert max-w-none break-words whitespace-normal overflow-hidden text-gray-800 dark:text-gray-200 leading-relaxed mb-12 md:mb-16" 
             dangerouslySetInnerHTML={{ __html: post.content }} 
         />
 

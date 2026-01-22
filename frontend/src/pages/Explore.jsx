@@ -255,7 +255,7 @@ export default function Explore({
 
                                 {/* 2. TITLE */}
                                 <h3 
-                                    className="text-2xl font-bold text-gray-900 dark:text-white mb-3 leading-tight cursor-pointer hover:text-blue-600 dark:hover:!text-blue-400 transition break-words"
+                                    className="text-2xl font-bold text-gray-900 dark:text-white mb-3 leading-tight cursor-pointer hover:text-blue-600 dark:hover:!text-blue-400 transition break-words whitespace-normal"
                                     onClick={() => onPostClick && onPostClick(post.id)}
                                 >
                                     {post.title}
@@ -305,7 +305,7 @@ export default function Explore({
 
                                 {/* 4. CONTENT PREVIEW */}
                                 <div 
-                                    className="text-gray-600 dark:text-gray-300 line-clamp-3 prose prose-sm dark:prose-invert max-w-none cursor-pointer feed-summary break-words" 
+                                    className="text-gray-600 dark:text-gray-300 line-clamp-3 prose prose-sm dark:prose-invert max-w-none cursor-pointer feed-summary break-words whitespace-normal" 
                                     dangerouslySetInnerHTML={{ __html: post.content }}
                                     onClick={() => onPostClick && onPostClick(post.id)} 
                                 />
