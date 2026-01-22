@@ -8,6 +8,7 @@ import os
 import environ
 import dj_database_url 
 from datetime import timedelta
+import django
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -131,9 +132,13 @@ REST_FRAMEWORK = {
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+WHITENOISE_ROOT = STATIC_ROOT
 
-
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+]
 
 
 # =========================================================
@@ -150,37 +155,32 @@ if os.environ.get('CLOUDINARY_CLOUD_NAME'):
         'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
     }
 
-    # Not using hard drive for uploads, using Cloudinary
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    # 3. Static Files (CSS/JS) -  using Whitenoise 
-    # Cloudinary handles User Uploads (Media), Whitenoise handles App Code (Static)
-    STORAGES = {
-        "default": {
-            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.StaticFilesStorage",
-        },
-    }
+    # Set media backend for Cloudinary
+    MY_MEDIA_BACKEND = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 else:
     # Local Development Fallback (If no keys in .env, use local folder)
     print(" No Cloudinary Keys found. Using local filesystem for Media.")
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    MY_MEDIA_BACKEND = "django.core.files.storage.FileSystemStorage"
+
+
+# =========================================================
+#  UNIFIED STORAGE CONFIGURATION
+# =========================================================
+# This ensures Static Files works consistently in Docker AND Production.
+
+STORAGES = {
+    # Media files change based on environment (Cloudinary vs Local)
+    "default": {
+        "BACKEND": MY_MEDIA_BACKEND,
+    },
     
-    # Default storage for local
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
-
-
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 # =========================================================
 #  CUSTOM SETTINGS (AI & EMAIL)
@@ -246,3 +246,4 @@ LOGGING = {
         'level': 'INFO',
     },
 }
+
