@@ -420,3 +420,8 @@ body {
 
 }
 
+.text-fix {
+  word-break: normal !important;     /* Keeps wordswhole */
+  overflow-wrap: anywhere !important; /* Breaks ONLY long URLs if they overflow */
+}
+
