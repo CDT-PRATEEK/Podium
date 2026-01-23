@@ -248,7 +248,7 @@ useEffect(() => {
         {/* Post Content */}
         <div 
             className="prose prose-lg md:prose-xl prose-slate dark:prose-invert max-w-none text-fix overflow-hidden text-gray-800 dark:text-gray-200 leading-relaxed mb-12 md:mb-16" 
-            dangerouslySetInnerHTML={{ __html: post.content }} 
+            dangerouslySetInnerHTML={{ __html: post.content.replace(/&nbsp;/g, ' ') }} 
         />
 
         {/* Discussion Section */}

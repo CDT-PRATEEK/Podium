@@ -306,7 +306,7 @@ export default function Explore({
                                 {/* 4. CONTENT PREVIEW */}
                                 <div 
                                     className="text-gray-600 dark:text-gray-300 line-clamp-3 prose prose-sm dark:prose-invert max-w-none cursor-pointer feed-summary text-fix" 
-                                    dangerouslySetInnerHTML={{ __html: post.content }}
+                                    dangerouslySetInnerHTML={{ __html: post.content.replace(/&nbsp;/g, ' ') }}
                                     onClick={() => onPostClick && onPostClick(post.id)} 
                                 />
 

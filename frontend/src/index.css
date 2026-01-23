@@ -50,6 +50,7 @@ body {
     transition-property: background-color, border-color, color, fill, stroke;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 300ms;
+    
 }
 
 .dark .bg-gray-50 {
@@ -209,6 +210,13 @@ body {
     padding: 0 !important;
     font-size: 1rem !important; /* Standardizes preview text size */
     line-height: 1.6 !important;
+}
+
+.feed-summary p::after,
+.feed-summary div::after,
+.feed-summary br {
+    content: " " !important;
+    display: inline !important;
 }
 
 .feed-summary {
@@ -421,7 +429,7 @@ body {
 }
 
 .text-fix {
-  word-break: normal !important;     /* Keeps wordswhole */
-  overflow-wrap: anywhere !important; /* Breaks ONLY long URLs if they overflow */
+  overflow-wrap: break-word !important; /* <--- Respects words, only breaks URLs */
+  word-break: normal !important;
 }
 

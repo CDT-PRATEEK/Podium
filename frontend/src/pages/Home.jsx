@@ -477,7 +477,7 @@ useEffect(() => {
 
                                 <div 
                                     className="prose prose-lg dark:prose-invert text-gray-700 dark:text-gray-300 max-w-none line-clamp-3 mb-4 feed-summary text-fix" 
-                                    dangerouslySetInnerHTML={{ __html: post.content }} 
+                                    dangerouslySetInnerHTML={{ __html: post.content.replace(/&nbsp;/g, ' ') }} 
                                 />
                                 
                                 <span className="text-blue-600 dark:text-blue-400 font-bold hover:underline mb-4 inline-block">

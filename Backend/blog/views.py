@@ -298,7 +298,7 @@ def recommendations(request):
     final_recs = recs.filter(relevance__gt=0).order_by('-relevance', '-date_posted', '-quality_ratio')[:10]
 
     # Fallback: If no relevant posts found, show highest quality trending posts
-    if not final_recs.exists():
+    if not final_recs:
         final_recs = recs.order_by('-quality_ratio', '-date_posted')[:10]
 
     serializer = PostSerializer(final_recs, many=True, context={'request': request})
