@@ -490,7 +490,7 @@ useEffect(() => {
                                     </div>
                                 </div>
 
-                                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 leading-tight hover:text-blue-600 dark:hover:!text-blue-400 transition">
+                                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 leading-tight hover:text-blue-600 dark:hover:!text-blue-400 transition break-words hyphens-auto line-clamp-2">
                                     {post.title}
                                 </h2>
                                 
