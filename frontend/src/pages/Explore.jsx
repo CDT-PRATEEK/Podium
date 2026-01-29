@@ -248,7 +248,7 @@ export default function Explore({
         {(searchText || selectedTopic) && (
             <div className="space-y-6 animate-fade-in-up">
                 
-                <div className="flex items-center justify-between mb-2 border-b border-gray-200 dark:border-gray-800 pb-2">
+                <div className="flex items-center justify-between mb-2 border-b border-gray-300 dark:border-gray-800 pb-2">
                     <h2 className="text-lg font-bold text-gray-800 dark:text-white">Results</h2>
                     <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                         {loading ? 'Searching...' : `${posts.length} matches found`}
@@ -265,7 +265,7 @@ export default function Explore({
                         <div 
                             ref={isLastPost ? lastPostElementRef : null} 
                             key={post.id} 
-                            className="group relative bg-white dark:bg-[#1a1a1a] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden hover:shadow-md dark:hover:shadow-[0_0_20px_rgba(37,99,235,0.15)] transition"
+                            className="group relative bg-white dark:bg-[#1a1a1a] rounded-xl border border-gray-900 dark:border-gray-800 shadow-sm overflow-hidden hover:shadow-md dark:hover:shadow-[0_0_20px_rgba(37,99,235,0.15)] transition"
                         >
                             <div className="p-6">
                                 
@@ -305,7 +305,7 @@ export default function Explore({
                                      
                                      {/* AVATAR */}
                                      <div 
-                                        className={`w-8 h-8 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700 transition flex items-center justify-center flex-shrink-0
+                                        className={`w-8 h-8 rounded-full overflow-hidden border border-gray-300 dark:border-gray-700 transition flex items-center justify-center flex-shrink-0
                                             ${isDeleted ? 'cursor-default bg-gray-100 dark:bg-gray-800' : 'cursor-pointer hover:opacity-80'}`}
                                         onClick={() => { if(!isDeleted) onProfileClick && onProfileClick(post.author_username) }}
                                      >
@@ -357,7 +357,7 @@ export default function Explore({
                                 </button>
                             </div>
                             
-                            <div className="px-6 pb-6 bg-gray-50/50 dark:bg-black border-t border-gray-100 dark:border-gray-800 transition-colors">
+                            <div className="px-6 pb-6 bg-gray-50/50 dark:bg-black border-t border-gray-300 dark:border-gray-800 transition-colors">
                                 <CommentSection 
                                     postId={post.id} 
                                     postAuthor={post.author_username} 
@@ -373,7 +373,7 @@ export default function Explore({
                 })}
 
                 {!loading && posts.length === 0 && (
-                    <div className="text-center py-20 bg-white dark:bg-[#1a1a1a] rounded-xl border border-gray-100 dark:border-gray-800 border-dashed">
+                    <div className="text-center py-20 bg-white dark:bg-[#1a1a1a] rounded-xl border border-gray-300 dark:border-gray-800 border-dashed">
                         <div className="flex justify-center mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-16 h-16 text-gray-200 dark:text-gray-700">
                               <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />

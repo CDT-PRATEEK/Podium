@@ -271,7 +271,7 @@ export default function Recommendations({ onPostClick, token, isFullPage = false
   }
 
   if (loading && !refreshing) return (
-    <div className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm space-y-4 ${isFullPage ? 'min-h-[50vh]' : ''}`}>
+    <div className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-300 dark:border-gray-700 p-6 shadow-sm space-y-4 ${isFullPage ? 'min-h-[50vh]' : ''}`}>
         <div className="h-5 bg-gray-100 dark:bg-gray-700 rounded w-1/3 animate-pulse"></div>
         <div className="space-y-4 pt-2">
             {[...Array(VISIBLE_COUNT)].map((_, i) => (
@@ -295,7 +295,7 @@ export default function Recommendations({ onPostClick, token, isFullPage = false
         className={`transition-all duration-300 overflow-hidden
             ${isFullPage 
                 ? 'w-full min-h-[80vh]' 
-                : 'bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md' 
+                : 'bg-white dark:bg-gray-800 rounded-2xl border border-gray-300 dark:border-gray-700 shadow-sm hover:shadow-md' 
             }`}
     >
       {refreshing && (
@@ -307,8 +307,8 @@ export default function Recommendations({ onPostClick, token, isFullPage = false
       {/* === HEADER === */}
       <div className={`flex justify-between items-center transition-colors 
             ${isFullPage 
-                ? 'bg-transparent border-b border-gray-100 dark:border-gray-800 mb-2 p-3 md:p-5' // Mobile: Compact
-                : 'border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30 p-5' // Desktop: Standard
+                ? 'bg-transparent border-b border-gray-300 dark:border-gray-800 mb-2 p-3 md:p-5' // Mobile: Compact
+                : 'border-b border-gray-300 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30 p-5' // Desktop: Standard
             }`}>
         
         <h3 className={`font-bold text-gray-900 dark:text-white flex items-center gap-2 ${isFullPage ? 'text-2xl' : 'text-base'}`}>
@@ -358,7 +358,7 @@ export default function Recommendations({ onPostClick, token, isFullPage = false
         )}
       </div>
       
-      <div className={`divide-y divide-gray-100 dark:divide-gray-700 ${isFullPage ? '' : ''}`}>
+      <div className={`divide-y divide-gray-300 dark:divide-gray-700 ${isFullPage ? '' : ''}`}>
         {displayedRecs.map((post, index) => {
             const isDeleted = post.author_username === "Deleted User";
             const isViewed = viewedIds.has(post.id);
@@ -422,7 +422,7 @@ export default function Recommendations({ onPostClick, token, isFullPage = false
       </div>
       
       {/* === FOOTER AREA (ALWAYS VISIBLE) === */}
-      <div className={`p-3 text-center border-t border-gray-100 dark:border-gray-700 
+      <div className={`p-3 text-center border-t border-gray-300 dark:border-gray-700 
             ${isFullPage 
                 ? 'bg-transparent pb-8 pt-4' // Mobile: Extra padding at bottom, transparent
                 : 'bg-gray-50 dark:bg-gray-900/30' // Desktop: Sidebar style

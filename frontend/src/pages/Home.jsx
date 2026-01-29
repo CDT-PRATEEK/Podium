@@ -346,7 +346,7 @@ useEffect(() => {
     <div>
         {/* EDITOR UI */}
         {showEditor && (
-            <div className="editor-container bg-white dark:bg-[#1a1a1a] p-4 md:p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 mb-10 animate-fade-in-down transition-colors">
+            <div className="editor-container bg-white dark:bg-[#1a1a1a] p-4 md:p-6 rounded-2xl shadow-xl border border-gray-300 dark:border-gray-800 mb-10 animate-fade-in-down transition-colors">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg md:text-xl font-bold text-gray-800 dark:text-white">{editingPost ? 'Edit Post' : 'New Post'}</h3>
                     <button onClick={closeEditor} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition">
@@ -388,7 +388,7 @@ useEffect(() => {
                         </div>
                     </div>
 
-                    <div className="quill-wrapper mb-6 md:mb-8 bg-white dark:bg-gray-50 h-64 md:h-96 rounded-lg overflow-hidden text-black border border-gray-200 dark:border-none">
+                    <div className="quill-wrapper mb-6 md:mb-8 bg-white dark:bg-gray-50 h-64 md:h-96 rounded-lg overflow-hidden text-black border border-gray-300 dark:border-none">
                         <ReactQuill 
                             ref={quillRef} 
                             theme="snow" 
@@ -452,7 +452,7 @@ useEffect(() => {
                         <div 
                             ref={isLastPost ? lastPostElementRef : null} 
                             key={post.id} 
-                            className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-200  dark:border-gray-800 shadow-sm overflow-hidden hover:shadow-md dark:hover:shadow-[0_0_20px_rgba(37,99,235,0.15)] transition duration-300 group cursor-pointer"
+                            className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-300  dark:border-gray-800 shadow-sm overflow-hidden hover:shadow-md dark:hover:shadow-[0_0_20px_rgba(37,99,235,0.15)] transition duration-300 group cursor-pointer"
                             onClick={() => {
                                 window.dispatchEvent(new CustomEvent('postViewed', { detail: post.id }));
                                 onPostClick(post.id);
