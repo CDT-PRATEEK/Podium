@@ -93,7 +93,7 @@ function App() {
        })
        .catch(err => {
             console.error("Profile fetch error", err);
-            //If profile fails (401), force logout
+        
             if (err.response?.status === 401) handleLogout();
         });
        fetchNotifications()
@@ -112,9 +112,8 @@ function App() {
         if (view === 'recommendations') {
             setView('home'); // Kick user back to Home
         }
-        // Add other mobile-only views here if you have them (e.g., 'create')
+    
         if (view === 'create') {
-             // Optional: if you don't want the mobile create screen on desktop
              setView('home'); 
         }
       }
@@ -199,9 +198,8 @@ function App() {
       // 3. Open Profile
       openProfile(currentUser, 'published');
 
-      // 4. FORCE SCROLL TO TOP (The Fix)
-      // Previously, this restored 'scrollPos.current.profile'. 
-      // Now we force it to 0 so it always starts at the top.
+      // 4. FORCE SCROLL TO TOP 
+      // we force it to 0 so it always starts at the top.
       setTimeout(() => {
           window.scrollTo({ top: 0, behavior: 'auto' });
       }, 10);
@@ -235,8 +233,8 @@ function App() {
   const openProfile = (username, tab = 'published') => {
       // === PREVENT GUESTS FROM OPENING PROFILE ===
       if (!token) {
-          showToast("Please log in to view user profiles.", "error"); // Or use 'info'
-          return; // Stop here! Do not switch view.
+          showToast("Please log in to view user profiles.", "error"); 
+          return; 
       }
 
       setInitialProfileTab(tab)

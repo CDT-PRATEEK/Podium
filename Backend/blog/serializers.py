@@ -94,14 +94,22 @@ class PostSerializer(serializers.ModelSerializer):
 # ==========================================
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField() # Changed to MethodField for masking
+    author = serializers.SerializerMethodField()
     replies = serializers.SerializerMethodField()
-    author_image = serializers.SerializerMethodField() # Added image for comments
+    author_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
         fields = ['id', 'post', 'author', 'author_image', 'text', 'date_posted', 'parent', 'replies']
         read_only_fields = ['author', 'date_posted', 'replies']
+
+    def __init__(self, *args, **kwargs):
+        
+        no_replies = kwargs.pop('no_replies', False)
+        super().__init__(*args, **kwargs)
+
+        if no_replies:
+            self.fields.pop('replies')
 
     def get_author(self, obj):
         if hasattr(obj.author, 'profile') and obj.author.profile.is_soft_deleted:
@@ -117,30 +125,39 @@ class CommentSerializer(serializers.ModelSerializer):
         return None
 
     def get_replies(self, obj):
-        if obj.replies.exists():
-            return CommentSerializer(obj.replies.all(), many=True).data
+        # 1. Safety: If this is already a child, do not look for more replies
+        if obj.parent_id:
+            return []
+
+        # 2. Standard Django Fetch (Relies on prefetch_related in View)
+        replies = obj.replies.all()
+
+        if replies:
+            return CommentSerializer(
+                replies, 
+                many=True, 
+                context=self.context,
+                no_replies=True # Stops recursion at Level 1
+            ).data
         return []
 
     def validate(self, attrs):
         request = self.context.get('request')
         user = request.user
         
-        # =================================================
-        # 1. EXISTING RULE: "Restricted Thread" Logic
-        # =================================================
         if 'parent' in attrs and attrs['parent']:
             parent = attrs['parent']
-            post_author_id = parent.post.author.id
             
-            # Find the "Root" Commenter
+            # --- 1. FIND THE ROOT (Traverse up) ---
             root_comment = parent
             while root_comment.parent:
                 root_comment = root_comment.parent
             
+            # --- 2. PERMISSION CHECK ---
             root_author_id = root_comment.author.id
+            post_author_id = parent.post.author.id
             current_user_id = user.id
 
-            # The Rule: Only Post Owner OR Root Commenter can reply
             is_op = current_user_id == post_author_id
             is_root = current_user_id == root_author_id
             
@@ -148,6 +165,11 @@ class CommentSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "Restricted Thread: Only the Post Author or the Original Commenter can reply here."
                 )
+
+            # --- 3. FLATTENING  ---
+            # If user replies to a Reply, force the parent to be the ROOT.
+            # This ensures the reply is visible in flat list.
+            attrs['parent'] = root_comment
 
         return attrs
 

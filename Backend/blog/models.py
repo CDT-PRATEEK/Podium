@@ -72,7 +72,7 @@ class Comment(models.Model):
     class Meta:
         ordering = ['date_posted']
         indexes = [
-            models.Index(fields=['post']), # Fast comment loading for a post
+            models.Index(fields=['post', 'date_posted']), # Fast comment loading for a post
         ]
 
     def __str__(self):

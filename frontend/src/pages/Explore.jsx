@@ -43,6 +43,45 @@ export default function Explore({
     }
   }
 
+
+  // === LISTEN FOR UPDATES FROM POST DETAIL PAGE ===
+  useEffect(() => {
+    // 1. Handle Comment Added (Increment)
+    const handleCommentAdded = (e) => {
+        const postId = e.detail;
+        setPosts(prevPosts => prevPosts.map(p => {
+            if (p.id === postId) {
+                // Safely increment count
+                return { ...p, total_comments: (p.total_comments || 0) + 1 };
+            }
+            return p;
+        }));
+    };
+
+    // 2. Handle Comment Deleted (Decrement)
+    const handleCommentDeleted = (e) => {
+        const postId = e.detail;
+        setPosts(prevPosts => prevPosts.map(p => {
+            if (p.id === postId) {
+                // Safely decrement count, min 0
+                return { ...p, total_comments: Math.max(0, (p.total_comments || 0) - 1) };
+            }
+            return p;
+        }));
+    };
+
+    window.addEventListener('commentAdded', handleCommentAdded);
+    window.addEventListener('commentDeleted', handleCommentDeleted);
+
+    return () => {
+        window.removeEventListener('commentAdded', handleCommentAdded);
+        window.removeEventListener('commentDeleted', handleCommentDeleted);
+    };
+  }, []);
+
+
+
+
   // === FETCH LOGIC ===
   useEffect(() => {
     if (!searchText && !selectedTopic) {
@@ -326,6 +365,7 @@ export default function Explore({
                                     currentUser={currentUser} 
                                     onProfileClick={onProfileClick}
                                     setView={setView}
+                                    initialCount={post.total_comments || 0}
                                 />
                             </div>
                         </div>

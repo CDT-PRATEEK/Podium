@@ -169,7 +169,25 @@ class PostListAPI(ListCreateAPIView):
 class CommentAPI(ListCreateAPIView):
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
+    def get_queryset(self):
+        post_id = self.request.query_params.get('post_id')
+        
+        # If fetching for a specific post
+        if post_id:
+            return Comment.objects.filter(post_id=post_id, parent=None)\
+                .select_related('author', 'author__profile')\
+                .prefetch_related(
+                    'replies', 
+                    'replies__author', 
+                    'replies__author__profile'
+                )\
+                .order_by('-date_posted')
+        
+        # Fallback for POST validation 
+        return Comment.objects.all()
 
+    # 2. AI LOGIC 
     async def acreate(self, request, *args, **kwargs):
         content = request.data.get('text', '')
 
@@ -204,11 +222,6 @@ class CommentAPI(ListCreateAPIView):
     async def perform_acreate(self, serializer):
         await sync_to_async(serializer.save)(author=self.request.user)
 
-    def get_queryset(self):
-        post_id = self.request.query_params.get('post_id')
-        if post_id:
-            return Comment.objects.filter(post_id=post_id, parent=None).order_by('-date_posted')
-        return Comment.objects.none()
 
 class CommentDetailAPI(generics.DestroyAPIView):
     queryset = Comment.objects.all()
@@ -295,14 +308,35 @@ def recommendations(request):
     # Priority 1: Relevance Score
     # Priority 2: Date Posted (Newest First)
     # Priority 3: Quality Ratio (Tie-breaker)
-    final_recs = recs.filter(relevance__gt=0).order_by('-relevance', '-date_posted', '-quality_ratio')[:10]
+    final_recs = recs.filter(relevance__gt=0).order_by('-relevance', '-date_posted', '-quality_ratio')[:8]
+    label = "For You"
 
-    # Fallback: If no relevant posts found, show highest quality trending posts
+
     if not final_recs:
-        final_recs = recs.order_by('-quality_ratio', '-date_posted')[:10]
+        final_recs = Post.published.all().annotate(
+    
+            views=Count('interactions', filter=Q(interactions__interaction_type='VIEW'), distinct=True),
+            total_comments=Count('comments', distinct=True),
+            op_replies=Count('comments', filter=Q(comments__author=F('author')), distinct=True),
+        ).annotate(
+            quality_ratio=Case(
+                When(total_comments=0, then=Value(0.0)),
+                default=F('op_replies') * 1.0 / F('total_comments'),
+                output_field=FloatField()
+            )
+        ).order_by('-quality_ratio', '-views')[:32]  
+        label = "Top Picks"
+
+    # If Attempt 3 returned empty (e.g. math fail), just grab the newest posts.
+    if not final_recs:
+        final_recs = Post.published.all().order_by('-date_posted')[:32]
+        label = "Top Picks"
 
     serializer = PostSerializer(final_recs, many=True, context={'request': request})
-    return Response(serializer.data)
+    return Response({
+        "posts": serializer.data, 
+        "label": label
+    })
 
 
 

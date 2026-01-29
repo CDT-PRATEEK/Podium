@@ -44,6 +44,40 @@ export default function Home({
     { id: 'ART',  label: 'Art & Culture' }, { id: 'LIFE', label: 'Life & Self' },
   ]
 
+  useEffect(() => {
+    // Handle Comment Added (Increment)
+    const handleCommentAdded = (e) => {
+        const postId = e.detail;
+        setPosts(prevPosts => prevPosts.map(p => {
+            if (p.id === postId) {
+                return { ...p, total_comments: (p.total_comments || 0) + 1 };
+            }
+            return p;
+        }));
+    };
+
+    // Handle Comment Deleted (Decrement)
+    const handleCommentDeleted = (e) => {
+        const postId = e.detail;
+        setPosts(prevPosts => prevPosts.map(p => {
+            if (p.id === postId) {
+                return { ...p, total_comments: Math.max(0, (p.total_comments || 0) - 1) };
+            }
+            return p;
+        }));
+    };
+
+    window.addEventListener('commentAdded', handleCommentAdded);
+    window.addEventListener('commentDeleted', handleCommentDeleted);
+
+    return () => {
+        window.removeEventListener('commentAdded', handleCommentAdded);
+        window.removeEventListener('commentDeleted', handleCommentDeleted);
+    };
+  }, []);
+
+
+
   // === LISTEN FOR MOBILE CREATE TRIGGER ===
   useEffect(() => {
       if (createTrigger) {
@@ -126,7 +160,7 @@ useEffect(() => {
             if (post.author_username === currentUser) {
                 return { 
                     ...post, 
-                    author_image: userProfile.image // Force update the image
+                    author_image: userProfile.image 
                 };
             }
             return post;
@@ -146,6 +180,23 @@ useEffect(() => {
           clearPostToEdit() 
       }
   }, [postToEdit])
+
+  useEffect(() => {
+    const handleRemoteDelete = (e) => {
+        const deletedId = e.detail;
+        
+        // 1. Instantly remove from the feed list
+        setPosts(prev => prev.filter(p => p.id !== deletedId));
+
+        // 2. Also broadcast it again just in case Sidebar missed it
+    };
+
+    window.addEventListener('postDeleted', handleRemoteDelete);
+
+    return () => {
+        window.removeEventListener('postDeleted', handleRemoteDelete);
+    };
+  }, []);
 
   const getImageUrl = (path) => {
       if (!path) return null;
@@ -215,6 +266,14 @@ useEffect(() => {
 
     try {
         await postService.savePost(postData, editingPost?.id);
+        
+    
+        // If we are PUBLISHING (1) a NEW post (!editingPost), tell the Sidebar to refresh
+        if (postStatus === 1 && !editingPost) {
+            window.dispatchEvent(new Event('postCreated'));
+        }
+
+
         closeEditor()
         loadFeed() 
         showToast(postStatus === 1 ? "Published Successfully" : "Draft Saved", 'success')
@@ -224,12 +283,17 @@ useEffect(() => {
     }
   }
 
-  // === DELETE ACTION ===
+  
+// === DELETE ACTION ===
   const handleDelete = async (e, id) => {
     e.stopPropagation(); 
     if(!window.confirm("Moderator/Owner Action:\nAre you sure you want to delete this post?")) return;
     
+    // 1. Remove from Main Feed (Optimistic)
     setPosts(prev => prev.filter(p => p.id !== id));
+
+    // 2. BROADCAST TO SIDEBAR 
+    window.dispatchEvent(new CustomEvent('postDeleted', { detail: id }));
     
     try {
         await postService.deletePost(id)
@@ -300,6 +364,7 @@ useEffect(() => {
                         value={title} 
                         onChange={e => setTitle(e.target.value)} 
                         required 
+                        maxLength={100}
                     />
                     
                     <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -388,7 +453,10 @@ useEffect(() => {
                             ref={isLastPost ? lastPostElementRef : null} 
                             key={post.id} 
                             className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-200  dark:border-gray-800 shadow-sm overflow-hidden hover:shadow-md dark:hover:shadow-[0_0_20px_rgba(37,99,235,0.15)] transition duration-300 group cursor-pointer"
-                            onClick={() => onPostClick(post.id)}
+                            onClick={() => {
+                                window.dispatchEvent(new CustomEvent('postViewed', { detail: post.id }));
+                                onPostClick(post.id);
+                            }}
                         >
                             <div className="p-5 md:p-8">
                                 {/* HEADER */}

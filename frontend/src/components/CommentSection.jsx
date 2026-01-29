@@ -1,7 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import api from '../services/api' 
+import { API_URL } from '../config'; 
+import CommentSkeleton from './CommentSkeleton'
 
-// Recursive Comment Component
+const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    return `${API_URL}${path}`;
+}
+
 function CommentItem({ 
     comment, 
     token, 
@@ -9,6 +16,7 @@ function CommentItem({
     isModerator, 
     onReply, 
     onRefresh, 
+    onDeleteSuccess, 
     postAuthor, 
     onProfileClick,
     rootAuthor 
@@ -42,6 +50,8 @@ function CommentItem({
         try {
             await api.delete(`comments/${comment.id}/`)
             onRefresh() 
+            // 2. Call the parent function to update count & broadcast
+            if (onDeleteSuccess) onDeleteSuccess(); 
         } catch (err) {
             alert("Failed to delete comment.")
         }
@@ -55,13 +65,20 @@ function CommentItem({
                     ${isDeleted ? 'cursor-default bg-gray-100 dark:bg-gray-800' : 'cursor-pointer hover:opacity-80 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600'}`}
                 onClick={() => { if(!isDeleted) onProfileClick(comment.author) }} 
             >
+                
                 {isDeleted ? (
                     /* Ghost Icon */
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 md:w-5 md:h-5 text-gray-400 dark:text-gray-500">
                         <path fillRule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v.54l1.838-.46a9.75 9.75 0 0 1 6.725 7.38l.108.537a.75.75 0 0 1-.826.89h-1.296l-1.38 5.176a9.499 9.499 0 0 1-5.69 6.666l-.1.026-.062.016a.75.75 0 0 1-.762-.317l-1.87-2.906a.75.75 0 0 1 .15-1.042l3.41-2.436a13.91 13.91 0 0 1-5.118-2.616l-1.854 1.325a.75.75 0 0 1-1.042-.15l-1.87-2.907a.75.75 0 0 1 .05-.98l.061-.065a9.499 9.499 0 0 1 5.92-2.126l1.378-5.176H9.366a.75.75 0 0 1-.826-.89l.108-.536a9.75 9.75 0 0 1 6.725-7.38l1.838.46v-.54a.75.75 0 0 1 .75-.75Z" clipRule="evenodd" />
                     </svg>
+                ) : comment.author_image ? (
+                    <img 
+                        src={getImageUrl(comment.author_image)} 
+                        className="w-full h-full object-cover" 
+                        alt="avatar" 
+                    />
                 ) : (
-                    <div className="text-[10px] md:text-xs font-bold text-gray-600 dark:text-gray-200">
+                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
                         {comment.author[0].toUpperCase()}
                     </div>
                 )}
@@ -134,7 +151,7 @@ function CommentItem({
                             className="w-full pl-4 pr-16 py-2.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition shadow-sm"
                             placeholder={`Reply...`}
                             value={replyText}
-                            onChange={e => setReplyText(e.target.value)}
+                            onChange={e => setReplyText(e.target.value)} 
                             autoFocus
                         />
                         <button 
@@ -162,8 +179,9 @@ function CommentItem({
                                 isModerator={isModerator} 
                                 onReply={onReply}
                                 onRefresh={onRefresh}
-                                postAuthor={postAuthor}
-                                onProfileClick={onProfileClick}
+                                onDeleteSuccess={onDeleteSuccess} // 3. Pass Recursively
+                                postAuthor={postAuthor} 
+                                onProfileClick={onProfileClick} 
                                 rootAuthor={rootAuthor || comment.author} 
                             />
                         ))}
@@ -184,15 +202,23 @@ function CommentSection({
     onProfileClick,
     startOpen = false, 
     showToast,
-    setView
+    setView,
+    initialCount = 0 
 }) {
   const [comments, setComments] = useState([])
   const [newComment, setNewComment] = useState('')
   const [isOpen, setIsOpen] = useState(startOpen)
   const [nextPage, setNextPage] = useState(null)
   const [loadingMore, setLoadingMore] = useState(false)
+  const [loading, setLoading] = useState(false)
+  
+  const [realCount, setRealCount] = useState(initialCount)
 
   const sectionRef = useRef(null)
+
+  useEffect(() => {
+    setRealCount(initialCount)
+  }, [initialCount])
 
   useEffect(() => {
     if (startOpen) {
@@ -203,18 +229,45 @@ function CommentSection({
     }
   }, [startOpen]) 
 
+  useEffect(() => {
+      const handleRemoteUpdate = (e) => {
+          // If event is for THIS post AND we are visible
+          if (e.detail === postId && isOpen) {
+              fetchComments(); 
+          }
+      }
+
+      window.addEventListener('commentAdded', handleRemoteUpdate);
+      window.addEventListener('commentDeleted', handleRemoteUpdate);
+
+      return () => {
+          window.removeEventListener('commentAdded', handleRemoteUpdate);
+          window.removeEventListener('commentDeleted', handleRemoteUpdate);
+      }
+  }, [postId, isOpen]);
+
   const fetchComments = () => {
+      setLoading(true)
       api.get(`comments/?post_id=${postId}`)
         .then(res => {
+            let fetchedData = [];
             if (res.data.results) {
-                setComments(res.data.results)
-                setNextPage(res.data.next)
+                fetchedData = res.data.results;
+                setNextPage(res.data.next);
             } else {
-                setComments(res.data)
-                setNextPage(null)
+                fetchedData = res.data;
+                setNextPage(null);
             }
+            setComments(fetchedData)
+
+            const totalVisible = fetchedData.reduce((acc, root) => {
+                return acc + 1 + (root.replies ? root.replies.length : 0);
+            }, 0);
+            
+            setRealCount(prev => Math.max(prev, totalVisible))
         })
         .catch(err => console.error(err))
+        .finally(() => setLoading(false))
   }
 
   const handleLoadMore = () => {
@@ -239,6 +292,13 @@ function CommentSection({
     }
   }, [postId, isOpen])
 
+  // === 4. NEW HANDLER for Deletion ===
+  // This updates local count AND shouts to the global app
+  const handleDeleteSuccess = () => {
+      setRealCount(prev => Math.max(0, prev - 1));
+      window.dispatchEvent(new CustomEvent('commentDeleted', { detail: postId }));
+  }
+
   const postComment = async (parentId = null, text) => {
     if (!text.trim()) return false
 
@@ -248,15 +308,17 @@ function CommentSection({
         
         fetchComments() 
         
+        // 5. Update Count & Broadcast on Add
+        setRealCount(prev => prev + 1)
+        window.dispatchEvent(new CustomEvent('commentAdded', { detail: postId }));
+
         if (!parentId) setNewComment('') 
         
         if (showToast) {
             const message = parentId ? "Reply posted!" : "Comment posted!";
             showToast(message, "success");
         }
-        
         return true
-
     } catch (err) {
         console.error(err)
         const errorMessage = err.response?.data?.detail || "Failed to post.";
@@ -275,7 +337,7 @@ function CommentSection({
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
             </svg>
-            <span>Comments</span>
+            <span>Comments {realCount > 0 && `(${realCount})`}</span>
         </div>
         <span className="text-gray-400 ml-auto md:ml-0">
             {isOpen ? (
@@ -288,64 +350,40 @@ function CommentSection({
 
       {isOpen && (
         <div className="mt-6 animate-fade-in w-full">
-            
-            {/* === MAIN COMMENT INPUT (Unified) === */}
             {token ? (
                 <div className="relative w-full mb-6 md:mb-8">
-                    <input 
-                        className="w-full pl-5 pr-20 py-3 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition text-sm shadow-sm"
-                        type="text" 
-                        placeholder="Write a comment..." 
-                        value={newComment} 
-                        onChange={e => setNewComment(e.target.value)} 
-                        onKeyDown={e => e.key === 'Enter' && postComment(null, newComment)}
-                    />
-                    <button 
-                        onClick={() => postComment(null, newComment)} 
-                        disabled={!newComment.trim()}
-                        className={`absolute right-1.5 top-1.5 bottom-1.5 px-4 rounded-full text-xs font-bold transition flex items-center justify-center
-                            bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-black dark:hover:bg-gray-200 shadow-sm
-                            ${!newComment.trim() ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}
-                        `}
-                    >
-                        Post
-                    </button>
+                    <input className="w-full pl-5 pr-20 py-3 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition text-sm shadow-sm" type="text" placeholder="Write a comment..." value={newComment} onChange={e => setNewComment(e.target.value)} onKeyDown={e => e.key === 'Enter' && postComment(null, newComment)} />
+                    <button onClick={() => postComment(null, newComment)} disabled={!newComment.trim()} className={`absolute right-1.5 top-1.5 bottom-1.5 px-4 rounded-full text-xs font-bold transition flex items-center justify-center bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-black dark:hover:bg-gray-200 shadow-sm ${!newComment.trim() ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}>Post</button>
                 </div>
             ) : (
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-center mb-8 border border-gray-100 dark:border-gray-700">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Please <button onClick={() => setView('login')} className="font-bold text-blue-600 dark:text-blue-400 hover:underline">Log In</button> to join the discussion.
-                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Please <button onClick={() => setView('login')} className="font-bold text-blue-600 dark:text-blue-400 hover:underline">Log In</button> to join the discussion.</p>
                 </div>
             )}
 
             <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-1 md:pr-2 custom-scrollbar w-full">
-                {comments.map(comment => (
-                    <CommentItem 
-                        key={comment.id} 
-                        comment={comment} 
-                        token={token} 
-                        currentUser={currentUser}
-                        isModerator={isModerator} 
-                        onReply={postComment}
-                        onRefresh={fetchComments}
-                        postAuthor={postAuthor}
-                        onProfileClick={onProfileClick}
-                        rootAuthor={comment.author} 
-                    />
-                ))}
-                
-                {comments.length === 0 && <p className="text-sm text-gray-400 italic text-center py-4">Be the first to comment.</p>}
-                
-                {nextPage && (
-                    <button 
-                        onClick={handleLoadMore}
-                        disabled={loadingMore}
-                        className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline mt-4 flex items-center justify-center gap-1 w-full py-2"
-                    >
-                        {loadingMore ? 'Loading...' : 'Load more comments'}
-                        {!loadingMore && <span>↓</span>}
-                    </button>
+                {loading ? (
+                    <> <CommentSkeleton /> <CommentSkeleton /> <CommentSkeleton /> </>
+                ) : (
+                    <>
+                        {comments.map(comment => ( 
+                            <CommentItem 
+                                key={comment.id} 
+                                comment={comment} 
+                                token={token} 
+                                currentUser={currentUser} 
+                                isModerator={isModerator} 
+                                onReply={postComment} 
+                                onRefresh={fetchComments}
+                                onDeleteSuccess={handleDeleteSuccess} // Pass handler
+                                postAuthor={postAuthor} 
+                                onProfileClick={onProfileClick} 
+                                rootAuthor={comment.author} 
+                            /> 
+                        ))}
+                        {comments.length === 0 && <p className="text-sm text-gray-400 italic text-center py-4">Be the first to comment.</p>}
+                        {nextPage && ( <button onClick={handleLoadMore} disabled={loadingMore} className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline mt-4 flex items-center justify-center gap-1 w-full py-2">{loadingMore ? 'Loading...' : 'Load more comments'} {!loadingMore && <span>↓</span>}</button> )}
+                    </>
                 )}
             </div>
         </div>

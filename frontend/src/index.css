@@ -14,6 +14,11 @@
   border-radius: 10px;
 }
 
+
+html, body {
+  overscroll-behavior-y: contain;
+}
+
 /* =========================================
    1. LOGIN / REGISTER BACKGROUND (Dot Grid)
    ========================================= */
@@ -433,3 +438,92 @@ body {
   word-break: normal !important;
 }
 
+/* =========================================
+   ROBUST CODE BLOCK STYLES
+   ========================================= */
+
+/* 1. Define Variables for Instant Switching */
+:root {
+  --code-btn-bg: #ffffff;
+  --code-btn-text: #374151;
+  --code-btn-border: #e5e7eb;
+  --code-btn-hover: #f3f4f6;
+}
+
+.dark {
+  --code-btn-bg: #1f2937; /* Gray-800 */
+  --code-btn-text: #e5e7eb; /* Gray-200 */
+  --code-btn-border: #374151; /* Gray-700 */
+  --code-btn-hover: #374151;
+}
+
+/* 2. Wrapper Layout */
+.code-wrapper {
+  position: relative;
+  margin: 1.5rem 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* 3. Content Scrollbar */
+.code-content {
+  overflow-x: auto;
+  margin: 0 !important;
+  padding: 1.25rem !important;
+}
+/* Scrollbar Styling */
+.code-content::-webkit-scrollbar { height: 8px; }
+.code-content::-webkit-scrollbar-track { background: transparent; }
+.code-content::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 4px;
+}
+.dark .code-content::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+}
+
+/* 4. The Button (Uses Variables) */
+.copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 50; /* Force it on top */
+  transition: opacity 0.2s ease, background-color 0.2s;
+  
+  /* Apply Variables */
+  background-color: var(--code-btn-bg);
+  color: var(--code-btn-text);
+  border: 1px solid var(--code-btn-border);
+}
+
+/* Hover State */
+.copy-btn:hover {
+  background-color: var(--code-btn-hover);
+}
+
+/* Success State (Green Override) */
+.copy-btn.success {
+  color: #059669 !important;
+  border-color: #059669 !important;
+}
+.dark .copy-btn.success {
+  color: #34d399 !important;
+  border-color: #34d399 !important;
+}
+
+/* 5. Visibility Logic (The Fix) */
+/* Default: Visible (for Mobile) */
+.copy-btn {
+  opacity: 1;
+}
+
+/* Desktop: Hide until hover */
+@media (hover: hover) {
+  .copy-btn { opacity: 0; }
+  .code-wrapper:hover .copy-btn { opacity: 1; }
+}

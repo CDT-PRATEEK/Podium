@@ -18,8 +18,55 @@ function PostDetail({
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
   const [readTime, setReadTime] = useState(1) 
-  
+  const [commentCount, setCommentCount] = useState(0)
   const [isBookmarked, setIsBookmarked] = useState(false)
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    
+    const fetchPostData = async () => {
+        try {
+            const res = await api.get(`posts/${postId}/`)
+            const postData = res.data
+            setPost(postData)
+            setIsBookmarked(postData.is_bookmarked)
+            
+            if (postData.content) {
+                const text = postData.content.replace(/<[^>]*>?/gm, '') 
+                const words = text.split(/\s+/).length
+                const minutes = Math.ceil(words / 200)
+                setReadTime(minutes)
+            }
+
+            if (postData.total_comments !== undefined) {
+                setCommentCount(postData.total_comments)
+            } else {
+
+                api.get(`comments/?post_id=${postId}`)
+                    .then(cRes => {
+                        const fetchedList = cRes.data.results || cRes.data;
+                        
+                        // Count 1 for the root + N for its replies
+                        const calculatedTotal = fetchedList.reduce((acc, root) => {
+                            return acc + 1 + (root.replies ? root.replies.length : 0);
+                        }, 0);
+
+                        setCommentCount(calculatedTotal);
+                    })
+                    .catch(err => console.error("Count fetch error", err))
+            }
+
+            setLoading(false)
+        } catch (err) {
+            console.error(err)
+            setLoading(false)
+        }
+    }
+
+    fetchPostData()
+  }, [postId])
+
+
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -60,10 +107,10 @@ function PostDetail({
 const viewRecordedId = useRef(null);
 
 useEffect(() => {
-        // 1. Check if we have a valid post and token
+
         if (token && post && post.id) {
             
-            // 2. CRITICAL CHECK: Only run if we haven't recorded THIS specific ID yet
+            //  CRITICAL CHECK: Only run if we haven't recorded THIS specific ID yet
             if (viewRecordedId.current !== post.id) {
                 
                 console.log(` Recording view for Post ${post.id}...`);
@@ -72,12 +119,75 @@ useEffect(() => {
                    .then(() => console.log(" View Success"))
                    .catch(err => console.error(" View Error", err));
 
-                // 3. Mark this ID as recorded immediately
+                //  Mark this ID as recorded immediately
                 viewRecordedId.current = post.id;
             }
         }
     }, [post?.id, token]);
 
+
+    useEffect(() => {
+        if (post) {
+            // 1. EVENT: Tell the system "I am viewing this post now"
+            window.dispatchEvent(new CustomEvent('postViewed', { detail: post.id }));
+
+            // 2. MEMORY: Write to storage so 'Recommendations' knows to filter it 
+            // when you navigate back to Home.
+            try {
+                const currentHidden = JSON.parse(sessionStorage.getItem('hidden_posts') || '[]');
+                if (!currentHidden.includes(post.id)) {
+                    sessionStorage.setItem('hidden_posts', JSON.stringify([...currentHidden, post.id]));
+                }
+            } catch (e) {
+                console.error("Storage error", e);
+            }
+        }
+    }, [post]); // Runs as soon as the post loads
+
+
+ // 1. Theme-Resistant Copy Button Injection
+  useEffect(() => {
+
+    if (!post?.content) return;
+
+    const codeBlocks = document.querySelectorAll('.prose pre');
+
+    codeBlocks.forEach((block) => {
+      // B. THE SAFETY CHECK:
+      // If React re-rendered, the wrapper is gone, so this returns false -> We wrap again.
+      // If React didn't touch the DOM, the wrapper is there -> We skip (prevent duplicates).
+      if (block.closest('.code-wrapper')) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-wrapper group'; // Classes handled by index.css
+
+      block.parentNode.insertBefore(wrapper, block);
+      wrapper.appendChild(block);
+      block.classList.add('code-content'); 
+
+      
+      const button = document.createElement('button');
+      button.className = 'copy-btn'; 
+      button.innerText = 'Copy';
+
+      button.onclick = () => {
+        const code = block.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          button.innerText = 'Copied!';
+          button.classList.add('success'); // Triggers green color
+          setTimeout(() => {
+            button.innerText = 'Copy';
+            button.classList.remove('success');
+          }, 2000);
+        });
+      };
+
+      // G. Inject Button
+      wrapper.appendChild(button);
+    });
+    
+    // NO DEPENDENCY ARRAY: Runs on every single render to fix the "Wipe" issue
+  });
 
 
   const handleBookmark = async () => {
@@ -99,8 +209,11 @@ useEffect(() => {
       
       try {
           await api.delete(`posts/${postId}/`)
+          
+          window.dispatchEvent(new CustomEvent('postDeleted', { detail: postId }));
+
           onBack() 
-          window.location.reload() 
+
       } catch (err) {
           console.error(err)
           alert("Failed to delete post.")
@@ -123,7 +236,7 @@ useEffect(() => {
     </div>
   )
 
-  // === DEFINE GHOST STATUS HERE ===
+  // ===  GHOST STATUS HERE ===
   const isDeleted = post.author_username === "Deleted User";
 
   return (
@@ -266,6 +379,7 @@ useEffect(() => {
                 startOpen={focusComments} 
                 showToast={showToast}
                 setView={setView}
+                initialCount={commentCount}
             />
         </div>
       </article>
