@@ -12,7 +12,7 @@ env/
 venv/
 .myenv/
 myenv/
-Backend/blog/management/
+blog/management/
 
 # Static/Media
 media/
