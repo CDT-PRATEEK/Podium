@@ -1,4 +1,5 @@
-# Podium - **View the application here:** [Visit Podium](https://podiumapp.vercel.app)
+# Podium
+### **View the application here:** [Visit Podium](https://podiumapp.vercel.app)
 
 <p align="center">
   <img src="docs/cover.png" alt="Podium Cover" width="800"/>
