@@ -1,4 +1,4 @@
-# Podium
+# Podium - **View the application here:** [Visit Podium](https://podiumapp.vercel.app)
 
 <p align="center">
   <img src="docs/cover.png" alt="Podium Cover" width="800"/>
@@ -9,10 +9,6 @@ Podium is a **full-stack, decoupled publishing platform** engineered for **long-
 It focuses on **writing-first UX**, **predictable moderation**, and **performance-conscious backend design**, avoiding engagement-driven clutter.
 
 ---
-
-## 🔗 Live Demo
-
-**View the application here:** [Visit Podium](https://podiumapp.vercel.app)
 
 ## ✨ Highlights
 
@@ -280,14 +276,14 @@ The feed uses a **strict three-tier priority system**:
 
 1.  **AI Service Setup**
     ```bash
-    cd ai_service
+    cd AI_Service
     pip install -r requirements.txt
     uvicorn main:app --reload --port 8001
     ```
 
 2.  **Backend Setup**
     ```bash
-    cd backend
+    cd Backend
     python -m venv venv
     source venv/bin/activate
     pip install -r requirements.txt
