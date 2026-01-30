@@ -30,7 +30,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', default=False)
 
 # Allow hosts from environment (e.g., '.koyeb.app')
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])
 
 
 # =========================================================
@@ -110,9 +110,9 @@ DATABASES = {
 
 
 FRONTEND_URL= env('FRONTEND_URL', default='http://localhost:5173')
-CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS')
+CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[FRONTEND_URL])
 CORS_ALLOW_CREDENTIALS = True
-CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS')
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[FRONTEND_URL])
 
 
 REST_FRAMEWORK = {
@@ -195,7 +195,7 @@ GOOGLE_CLIENT_SECRET = env('GOOGLE_CLIENT_SECRET', default='')
 GOOGLE_REFRESH_TOKEN = env('GOOGLE_REFRESH_TOKEN', default='')
 
 # cleanup
-CRON_SECRET_KEY = env('CRON_SECRET_KEY')
+CRON_SECRET_KEY = env('CRON_SECRET_KEY', default='')
 
 # Password Validation
 AUTH_PASSWORD_VALIDATORS = [

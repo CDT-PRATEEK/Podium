@@ -265,7 +265,7 @@ export default function Explore({
                         <div 
                             ref={isLastPost ? lastPostElementRef : null} 
                             key={post.id} 
-                            className="group relative bg-white dark:bg-[#1a1a1a] rounded-xl border border-gray-900 dark:border-gray-800 shadow-sm overflow-hidden hover:shadow-md dark:hover:shadow-[0_0_20px_rgba(37,99,235,0.15)] transition"
+                            className="group relative bg-white dark:bg-[#1a1a1a] rounded-xl border border-gray-300 dark:border-gray-800 shadow-sm overflow-hidden hover:shadow-md dark:hover:shadow-[0_0_20px_rgba(37,99,235,0.15)] transition"
                         >
                             <div className="p-6">
                                 

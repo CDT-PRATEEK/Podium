@@ -27,7 +27,7 @@ import PostDetail from './pages/PostDetail'
 function App() {
 
   const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('theme') === 'dark'
+    return localStorage.getItem('theme') !== 'light';
   })
 
   useEffect(() => {

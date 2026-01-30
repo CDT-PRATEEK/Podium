@@ -20,6 +20,17 @@
       name="description"
       content="Podium - Controlled interactive social content platform"
     />
+
+    <script>
+    (function() {
+      const storedTheme = localStorage.getItem('theme');
+      if (storedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
   </head>
   <body>
     <div id="root"></div>
