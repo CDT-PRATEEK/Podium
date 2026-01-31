@@ -2,7 +2,7 @@
 **View the application here:** [Visit Podium](https://podiumapp.vercel.app)
 
 <p align="center">
-  <img src="docs/cover.png" alt="Podium Cover" width="800"/>
+  <img src="assets/cover.png" alt="Podium Cover" width="800"/>
 </p>
 
 Podium is a **full-stack, decoupled publishing platform** engineered for **long-form content**, **structured discussion**, and **context-aware discovery**.
@@ -38,7 +38,7 @@ Podium is built around the following constraints:
 ## 📝 Rich-Text-First Authoring
 
 <p align="center">
-  <img src="docs/editor.png" alt="Rich Text Editor" width="800"/>
+  <img src="assets/editor.png" alt="Rich Text Editor" width="800"/>
 </p>
 
 - Rich editor with embedded images, headings, and code blocks
@@ -89,12 +89,28 @@ This ensures:
 ## 🧭 Explore & Discovery Architecture
 
 <p align="center">
-  <img src="docs/explore.png" alt="Explore page" width="800"/>
+  <img src="assets/explore.png" alt="Explore page" width="800"/>
 </p>
 
 The Explore page is the core discovery engine of Podium. It serves two distinct functions: **Global Feed Discovery** and **Context-Aware Recommendations**.
 
 It is engineered to solve the "Cold Start" problem without relying on invasive user tracking.
+
+---
+
+## 👤 Smart Profile & Content Dashboard
+
+<p align="center">
+  <img src="assets/library.png" alt="Explore page" width="800"/>
+</p>
+
+* **Unified Workspace:** A centralized hub managing the full user lifecycle:
+    * **Published:** Public-facing articles.
+    * **Drafts:** Private, work-in-progress content.
+    * **Library:** Personal reading list (Bookmarks).
+* **Identity Management:** Integrated controls for Bio (150-char limit) and Interest tags.
+* **Reactive Architecture:** User state is lifted to the root (`App.jsx`), ensuring avatar and bio updates propagate instantly to the Navbar and Sidebar without page reloads.
+* **Smart Media Handling:** Implements automatic cache-busting for avatar updates and dynamic fallbacks (CSS gradients) for users without profile images.
 
 ---
 
@@ -241,7 +257,18 @@ The feed uses a **strict three-tier priority system**:
 | **API** | DRF | REST API with Token Auth. |
 | **AI Service** | FastAPI | Microservice for moderation. |
 | **Database** | PostgreSQL | Production-grade relational DB. |
+| **Media** | CLoudinary | For Profile pictures and post images. |
 | **DevOps** | Docker | Containerization & Orchestration. |
+
+---
+
+## 🚀 Deployment & Infrastructure
+
+* **Frontend:** Deployed on **Vercel**, utilizing their Global Edge Network for zero-latency static asset delivery.
+* **Backend:** Hosted on **Render** (Singapore Region), physically colocated near the database to ensure <50ms query round-trip times.
+* **AI Microservice:** Deployed as a separate web service on **Render**, communicating with the Django backend via internal networking.
+* **Database:** Serverless **PostgreSQL on Neon**, decoupling compute from storage for instant scaling.
+* **Media:** Offloaded to **Cloudinary** for on-the-fly image optimization and global CDN distribution.
 
 ---
 
