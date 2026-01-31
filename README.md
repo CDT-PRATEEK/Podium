@@ -257,7 +257,7 @@ The feed uses a **strict three-tier priority system**:
 | **API** | DRF | REST API with Token Auth. |
 | **AI Service** | FastAPI | Microservice for moderation. |
 | **Database** | PostgreSQL | Production-grade relational DB. |
-| **Media** | CLoudinary | For Profile pictures and post images. |
+| **Media** | Cloudinary | For Profile pictures and post images. |
 | **DevOps** | Docker | Containerization & Orchestration. |
 
 ---
