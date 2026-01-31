@@ -213,8 +213,6 @@ export default function Recommendations({ onPostClick, token, isFullPage = false
         // 2. Also mark as hidden in storage (just to be safe/clean)
         hidePostGlobally(id);
     }
-
-    const handleRemoteCreate = () => { fetchRecs(true); };
     
     const handleRemoteView = (e) => {
         const id = Number(e.detail);
@@ -222,12 +220,10 @@ export default function Recommendations({ onPostClick, token, isFullPage = false
     };
 
     window.addEventListener('postDeleted', handleRemoteDelete);
-    window.addEventListener('postCreated', handleRemoteCreate);
     window.addEventListener('postViewed', handleRemoteView);
 
     return () => {
         window.removeEventListener('postDeleted', handleRemoteDelete);
-        window.removeEventListener('postCreated', handleRemoteCreate);
         window.removeEventListener('postViewed', handleRemoteView);
     };
   }, [fetchRecs, activeMode])

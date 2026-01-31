@@ -275,7 +275,7 @@ def recommendations(request):
     all_interested_topics = list(set(explicit_topics) | clicked_topics)
 
     # 2. SCORING (Filter out posts they've already seen)
-    queryset = Post.published.exclude(id__in=viewed_ids)
+    queryset = Post.published.exclude(id__in=viewed_ids).exclude(author=user)
 
     tag_query = Q()
     for tag in clicked_tags:
@@ -313,7 +313,7 @@ def recommendations(request):
 
 
     if not final_recs:
-        final_recs = Post.published.all().annotate(
+        final_recs = Post.published.exclude(author=user).annotate(
     
             views=Count('interactions', filter=Q(interactions__interaction_type='VIEW'), distinct=True),
             total_comments=Count('comments', distinct=True),
@@ -329,7 +329,7 @@ def recommendations(request):
 
     # If Attempt 3 returned empty (e.g. math fail), just grab the newest posts.
     if not final_recs:
-        final_recs = Post.published.all().order_by('-date_posted')[:32]
+        final_recs = Post.published.exclude(author=user).order_by('-date_posted')[:32]
         label = "Top Picks"
 
     serializer = PostSerializer(final_recs, many=True, context={'request': request})
@@ -405,7 +405,7 @@ class PostDetailAPI(RetrieveUpdateDestroyAPIView):
 
     # 4. HELPER (Required for Async Delete)
     async def perform_adestroy(self, instance):
-        await sync_to_async(instance.delete)()
+        await sync_to_async(Post.objects.filter(pk=instance.pk).delete)()
 
 
 @api_view(['GET'])
