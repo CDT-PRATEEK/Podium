@@ -277,7 +277,7 @@ The feed uses a **strict three-tier priority system**:
 - Soft deletion via `is_soft_deleted`
 - Public data masked instead of removed
 - Relational integrity preserved
-- Supports account restoration window
+- Supports account restoration window of 30 days
 
 ---
 
